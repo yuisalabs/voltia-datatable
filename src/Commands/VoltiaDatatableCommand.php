@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Yuisa\VoltiaDatatable\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class VoltiaDatatableCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'voltia-datatable';
 
     public $description = 'My command';
 
