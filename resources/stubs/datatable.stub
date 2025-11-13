@@ -1,0 +1,67 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Builder;
+use {{ rootNamespace }}Models\{{ model }};
+use Yuisa\VoltiaDatatable\Table;
+use Yuisa\VoltiaDatatable\Column;
+use Yuisa\VoltiaDatatable\Filters\SelectFilter;
+use Yuisa\VoltiaDatatable\Filters\TextFilter;
+use Yuisa\VoltiaDatatable\Filters\BooleanFilter;
+use Yuisa\VoltiaDatatable\Filters\DateRangeFilter;
+
+class {{ class }} extends Table
+{
+    /**
+     * Define the query for the datatable
+     */
+    public function query(): Builder
+    {
+        return {{ model }}::query();
+    }
+
+    /**
+     * Define the columns for the datatable
+     * 
+     * @return Column[]
+     */
+    public function columns(): array
+    {
+        return [
+            Column::make('id', 'ID')
+                ->sortable()
+                ->searchable(),
+            
+            Column::make('name', 'Name')
+                ->sortable()
+                ->searchable(),
+            
+            Column::make('created_at', 'Created At')
+                ->sortable()
+                ->format(fn ($row, $value) => $value?->format('Y-m-d H:i:s')),
+            
+            Column::make('updated_at', 'Updated At')
+                ->sortable()
+                ->format(fn ($row, $value) => $value?->format('Y-m-d H:i:s')),
+        ];
+    }
+
+    /**
+     * Define the filters for the datatable
+     * 
+     * @return array<string, \Yuisa\VoltiaDatatable\Filter>
+     */
+    protected function filters(): array
+    {
+        return [
+            // 'status' => new SelectFilter('status', [
+            //     'active' => 'Active',
+            //     'inactive' => 'Inactive',
+            // ]),
+            // 'search' => new TextFilter('name'),
+            // 'is_verified' => new BooleanFilter('is_verified'),
+            // 'created_at' => new DateRangeFilter('created_at'),
+        ];
+    }
+}

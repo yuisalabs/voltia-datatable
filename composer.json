@@ -1,5 +1,5 @@
 {
-    "name": "yuisa-scarlet/voltia-datatable",
+    "name": "yuisalabs/voltia-datatable",
     "description": "Modern DataTable for Laravel Inertia.js. Clean syntax, customizable, testable and production ready UX",
     "keywords": [
         "yuisa",

@@ -1,76 +1,268 @@
 # Voltia DataTable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/yuisa-scarlet/voltia-datatable.svg?style=flat-square)](https://packagist.org/packages/yuisa-scarlet/voltia-datatable)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/yuisa-scarlet/voltia-datatable/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yuisa-scarlet/voltia-datatable/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/yuisa-scarlet/voltia-datatable/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/yuisa-scarlet/voltia-datatable/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/yuisa-scarlet/voltia-datatable.svg?style=flat-square)](https://packagist.org/packages/yuisa-scarlet/voltia-datatable)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/yuisalabs/voltia-datatable.svg?style=flat-square)](https://packagist.org/packages/yuisalabs/voltia-datatable)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/yuisalabs/voltia-datatable/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yuisalabs/voltia-datatable/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/yuisalabs/voltia-datatable.svg?style=flat-square)](https://packagist.org/packages/yuisalabs/voltia-datatable)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Modern, elegant DataTable package for Laravel with Inertia.js support. Built with clean syntax, fully customizable, and production-ready.
 
-## Installation
+## ✨ Features
 
-You can install the package via composer:
+- 🚀 **Easy to use** - Simple, fluent API for defining tables
+- 🔍 **Full-text search** - Search across multiple columns
+- 🔄 **Sorting** - Sort by any column with direction control
+- 📊 **Filters** - Multiple filter types (Select, Text, Boolean, DateRange)
+- 📄 **Pagination** - Built-in pagination with customizable per-page options
+- 🎯 **Type-safe** - Full PHP 8.3+ type hints
+- 🔗 **Eager loading** - Automatic relationship eager loading
+- ⚡ **Performance** - Optimized queries for large datasets
+- 🎨 **Inertia.js ready** - Perfect for Vue/React frontends
+
+## 📦 Installation
+
+Install the package via composer:
 
 ```bash
-composer require yuisa-scarlet/voltia-datatable
+composer require yuisalabs/voltia-datatable
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="voltia-datatable-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
+Publish the config file:
 
 ```bash
 php artisan vendor:publish --tag="voltia-datatable-config"
 ```
 
-This is the contents of the published config file:
+## 🚀 Quick Start
+
+### 1. Generate a DataTable Class
+
+```bash
+php artisan make:datatable UserDataTable --model=User
+```
+
+This creates `app/DataTables/UserDataTable.php`:
+
+```php
+<?php
+
+namespace App\DataTables;
+
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
+use Yuisa\VoltiaDatatable\Table;
+use Yuisa\VoltiaDatatable\Column;
+use Yuisa\VoltiaDatatable\Filters\SelectFilter;
+use Yuisa\VoltiaDatatable\Filters\DateRangeFilter;
+
+class UserDataTable extends Table
+{
+    public function query(): Builder
+    {
+        return User::query();
+    }
+
+    public function columns(): array
+    {
+        return [
+            Column::make('id', 'ID')
+                ->sortable(),
+            
+            Column::make('name', 'Name')
+                ->sortable()
+                ->searchable(),
+            
+            Column::make('email', 'Email')
+                ->sortable()
+                ->searchable(),
+            
+            Column::make('status', 'Status')
+                ->sortable()
+                ->format(fn ($row, $value) => ucfirst($value)),
+            
+            Column::make('created_at', 'Created At')
+                ->sortable()
+                ->format(fn ($row, $value) => $value?->format('Y-m-d H:i:s')),
+        ];
+    }
+
+    protected function filters(): array
+    {
+        return [
+            'status' => new SelectFilter('status', [
+                'active' => 'Active',
+                'inactive' => 'Inactive',
+                'pending' => 'Pending',
+            ]),
+            'created_at' => new DateRangeFilter('created_at'),
+        ];
+    }
+}
+```
+
+### 2. Use in Controller
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Tables\UserDataTable;
+use Inertia\Inertia;
+
+class UserController extends Controller
+{
+    public function index(UserDataTable $datatable)
+    {
+        return Inertia::render('Users/Index', [
+            'datatable' => $datatable->make(),
+        ]);
+    }
+}
+```
+
+### 3. Frontend (Vue/React Example)
+
+The datatable returns a structured response:
+
+```javascript
+{
+  rows: [...],
+  columns: [...],
+  meta: {
+    page: 1,
+    perPage: 15,
+    total: 100,
+    from: 1,
+    to: 15
+  },
+  sort: {
+    sortBy: 'name',
+    sortDirection: 'asc'
+  },
+  search: 'john',
+  filters: {...}
+}
+```
+
+## 📖 Usage
+
+### Column Definition
+
+```php
+Column::make('key', 'Label')
+    ->sortable()          // Enable sorting
+    ->searchable()        // Enable searching
+    ->hidden()            // Hide column
+    ->align('center')     // Alignment: left, center, right
+    ->minWidth(150)       // Minimum width in pixels
+    ->format(fn ($row, $value) => ...) // Custom formatting
+```
+
+### Working with Relationships
+
+```php
+public function columns(): array
+{
+    return [
+        Column::make('user.name', 'User Name')
+            ->sortable()
+            ->searchable(),
+        
+        Column::make('user.email', 'Email')
+            ->searchable(),
+    ];
+}
+```
+
+The package automatically eager loads the `user` relationship!
+
+### Available Filters
+
+#### SelectFilter
+```php
+'status' => new SelectFilter('status', [
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+])
+```
+
+#### TextFilter
+```php
+'search' => new TextFilter('column_name')
+```
+
+#### BooleanFilter
+```php
+'is_verified' => new BooleanFilter('is_verified')
+```
+
+#### DateRangeFilter
+```php
+'created_at' => new DateRangeFilter('created_at')
+```
+
+### Custom Queries
+
+```php
+public function query(): Builder
+{
+    return User::query()
+        ->where('status', 'active')
+        ->with('roles');
+}
+```
+
+### Custom Formatting
+
+```php
+Column::make('price', 'Price')
+    ->format(fn ($row, $value) => 'Rp ' . number_format($value, 0, ',', '.'))
+
+Column::make('status', 'Status')
+    ->format(fn ($row, $value) => match($value) {
+        'active' => '✅ Active',
+        'inactive' => '❌ Inactive',
+        default => '⏸ Pending'
+    })
+```
+
+## ⚙️ Configuration
+
+Published config file (`config/voltia-datatable.php`):
 
 ```php
 return [
+    'default_per_page' => 15,
+    'per_page_options' => [10, 15, 25, 50, 100],
+    'max_per_page' => 100,
+    'query_string' => true,
+    'date_format' => 'Y-m-d',
 ];
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="voltia-datatable-views"
-```
-
-## Usage
-
-```php
-$voltiaDatatable = new Yuisa\VoltiaDatatable();
-echo $voltiaDatatable->echoPhrase('Hello, Yuisa!');
-```
-
-## Testing
+## 🧪 Testing
 
 ```bash
 composer test
 ```
 
-## Changelog
+## 📝 Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
-## Contributing
+## 🤝 Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security Vulnerabilities
+## 🔒 Security
 
 Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
-## Credits
+## 👥 Credits
 
-- [Ervalsa Dwi Nanda](https://github.com/yuisa-scarlet)
+- [Ervalsa Dwi Nanda](https://github.com/yuisalabs)
 - [All Contributors](../../contributors)
 
-## License
+## 📄 License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
