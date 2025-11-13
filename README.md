@@ -40,12 +40,12 @@ php artisan vendor:publish --tag="voltia-datatable-config"
 php artisan make:datatable UserDataTable --model=User
 ```
 
-This creates `app/DataTables/UserDataTable.php`:
+This creates `app/Tables/UserDataTable.php`:
 
 ```php
 <?php
 
-namespace App\DataTables;
+namespace App\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
