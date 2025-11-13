@@ -9,7 +9,7 @@ class Column
         public ?string $label = null,
         public bool $sortable = false,
         public bool $searchable = false,
-        public ?callable $format = null,
+        public mixed $format = null,
         public ?string $align = 'left',
         public ?int $minWidth = null,
         public ?bool $hidden = false
@@ -34,7 +34,7 @@ class Column
         return $this;
     }
 
-    public function format(callable $format): static
+    public function format(mixed $format): static
     {
         $this->format = $format;
         return $this;

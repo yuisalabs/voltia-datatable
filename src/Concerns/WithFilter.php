@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait WithFilter
 {
-    // ** @var array<string, Filter> */
+    /** @var array<string, Filter> */
     protected array $filters = [];
 
     protected function applyFilters(Builder $query): void
