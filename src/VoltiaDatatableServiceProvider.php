@@ -18,8 +18,6 @@ class VoltiaDatatableServiceProvider extends PackageServiceProvider
         $package
             ->name('voltia-datatable')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_voltia_datatable_table')
             ->hasCommand(VoltiaDatatableCommand::class);
     }
 }
