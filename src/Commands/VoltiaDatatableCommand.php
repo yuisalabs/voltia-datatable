@@ -9,7 +9,7 @@ class VoltiaDatatableCommand extends Command
 {
     public $signature = 'make:datatable {name} {--model=}';
 
-    public $description = 'Generate a new Voltia DataTable class';
+    public $description = 'Generate a new Voltia Table class';
 
     public function handle(): int
     {
@@ -17,8 +17,8 @@ class VoltiaDatatableCommand extends Command
         $model = $this->option('model') ?? Str::studly(Str::singular($name));
         
         $className = Str::studly($name);
-        if (!Str::endsWith($className, 'DataTable')) {
-            $className .= 'DataTable';
+        if (!Str::endsWith($className, 'Table')) {
+            $className .= 'Table';
         }
 
         $namespace = 'App\\Tables';
@@ -40,13 +40,13 @@ class VoltiaDatatableCommand extends Command
         $path = $directory . '/' . $className . '.php';
         
         if (file_exists($path)) {
-            $this->error("DataTable {$className} already exists!");
+            $this->error("Table {$className} already exists!");
             return self::FAILURE;
         }
 
         file_put_contents($path, $stub);
 
-        $this->info("DataTable [{$path}] created successfully.");
+        $this->info("Table [{$path}] created successfully.");
         $this->newLine();
         $this->comment("Next steps:");
         $this->line("1. Update the query() method to customize your query");
