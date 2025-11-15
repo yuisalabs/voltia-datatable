@@ -37,10 +37,10 @@ php artisan vendor:publish --tag="voltia-datatable-config"
 ### 1. Generate a DataTable Class
 
 ```bash
-php artisan make:datatable UserDataTable --model=User
+php artisan make:datatable UserTable --model=User
 ```
 
-This creates `app/Tables/UserDataTable.php`:
+This creates `app/Tables/UserTable.php`:
 
 ```php
 <?php
@@ -54,7 +54,7 @@ use Yuisa\VoltiaDatatable\Column;
 use Yuisa\VoltiaDatatable\Filters\SelectFilter;
 use Yuisa\VoltiaDatatable\Filters\DateRangeFilter;
 
-class UserDataTable extends Table
+class UserTable extends Table
 {
     public function query(): Builder
     {
@@ -106,12 +106,12 @@ class UserDataTable extends Table
 
 namespace App\Http\Controllers;
 
-use App\Tables\UserDataTable;
+use App\Tables\UserTable;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index(UserDataTable $datatable)
+    public function index(UserTable $datatable)
     {
         return Inertia::render('Users/Index', [
             'datatable' => $datatable->make(),
