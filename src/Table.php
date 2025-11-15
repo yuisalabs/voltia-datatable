@@ -2,6 +2,7 @@
 
 namespace Yuisalabs\VoltiaDatatable;
 
+use BadMethodCallException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Yuisalabs\VoltiaDatatable\Concerns\WithFilter;
@@ -25,6 +26,21 @@ abstract class Table
     protected function filters(): array
     {
         return [];
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        if ($name == 'make') {
+            /** @var static $table */
+            $table = app(static::class);
+            return $table->make();
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.',
+            static::class,
+            $name
+        ));
     }
 
     public function mountFromRequest(): void
