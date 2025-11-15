@@ -17,6 +17,9 @@ abstract class Table
     /** @var Column[] */
     protected array $columns = [];
 
+    /** @var array<int> */
+    protected array $perPageOptions = [];
+
     /** @return Builder */
     abstract public function query(): Builder;
 
@@ -54,9 +57,12 @@ abstract class Table
         $this->sortKey = $request->input('sortBy', $this->sortKey) ?: null;
         $this->sortDirection = $request->input('sortDirection', $this->sortDirection) === 'desc' ? 'desc' : 'asc';
         
-        $defaultPerPage = config('voltia-datatable.default_per_page', 15);
         $maxPerPage = config('voltia-datatable.max_per_page', 100);
-        $this->perPage = (int) min(max((int) $request->integer('perPage', $defaultPerPage), 1), $maxPerPage);
+        $perPageOptions = $this->resolvePerPageOptions($maxPerPage);
+        $defaultPerPage = config('voltia-datatable.default_per_page', 15);
+
+        $requestedPerPage = (int) $request->integer('perPage', $defaultPerPage);
+        $this->perPage = $this->normalizePerPage($requestedPerPage, $perPageOptions, $defaultPerPage);
     }
 
     public function make(): array
@@ -123,5 +129,31 @@ abstract class Table
             ->values();
 
         if ($relations->isNotEmpty()) $query->with($relations->all());
+    }
+
+    protected function resolvePerPageOptions(int $maxPerPage): array
+    {
+        $options = $this->perPageOptions ?: (array) config('voltia-datatable.per_page_options');
+
+        $options = collect($options)
+            ->map(fn ($value) => (int) $value)
+            ->filter(fn ($value) => $value > 0 && $value <= $maxPerPage)
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        if (empty($options)) {
+            $options = [min(10, $maxPerPage)];
+        }
+
+        return $options;
+    }
+
+    protected function normalizePerPage(int $requested, array $options, int $default): int
+    {
+        return in_array($requested, $options, true)
+            ? $requested
+            : (in_array($default, $options, true) ? $default : $options[0]);
     }
 }
