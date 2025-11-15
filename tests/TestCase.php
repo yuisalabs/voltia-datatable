@@ -1,10 +1,10 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Tests;
+namespace Yuisalabs\VoltiaDatatable\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Yuisa\VoltiaDatatable\VoltiaDatatableServiceProvider;
+use Yuisalabs\VoltiaDatatable\VoltiaDatatableServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,7 +13,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Yuisa\\VoltiaDatatable\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Yuisalabs\\VoltiaDatatable\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

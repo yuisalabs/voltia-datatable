@@ -4,8 +4,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Concerns\WithSort;
-use Yuisa\VoltiaDatatable\Column;
+use Yuisalabs\VoltiaDatatable\Concerns\WithSort;
+use Yuisalabs\VoltiaDatatable\Column;
 
 beforeEach(function () {
     Schema::create('test_products', function (Blueprint $table) {

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-use Yuisa\VoltiaDatatable\Commands\VoltiaDatatableCommand;
+use Yuisalabs\VoltiaDatatable\Commands\VoltiaDatatableCommand;
 
 beforeEach(function () {
     // Clean up any existing DataTable files

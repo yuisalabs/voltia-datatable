@@ -49,10 +49,10 @@ namespace App\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
-use Yuisa\VoltiaDatatable\Table;
-use Yuisa\VoltiaDatatable\Column;
-use Yuisa\VoltiaDatatable\Filters\SelectFilter;
-use Yuisa\VoltiaDatatable\Filters\DateRangeFilter;
+use Yuisalabs\VoltiaDatatable\Table;
+use Yuisalabs\VoltiaDatatable\Column;
+use Yuisalabs\VoltiaDatatable\Filters\SelectFilter;
+use Yuisalabs\VoltiaDatatable\Filters\DateRangeFilter;
 
 class UserTable extends Table
 {

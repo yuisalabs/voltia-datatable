@@ -1,6 +1,6 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Http\Requests;
+namespace Yuisalabs\VoltiaDatatable\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

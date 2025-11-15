@@ -1,10 +1,10 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Filters;
+namespace Yuisalabs\VoltiaDatatable\Filters;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Yuisa\VoltiaDatatable\Filter;
+use Yuisalabs\VoltiaDatatable\Filter;
 
 class DateRangeFilter extends Filter
 {

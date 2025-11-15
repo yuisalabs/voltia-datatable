@@ -1,9 +1,9 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Filters;
+namespace Yuisalabs\VoltiaDatatable\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
-use Yuisa\VoltiaDatatable\Filter;
+use Yuisalabs\VoltiaDatatable\Filter;
 
 class SelectFilter extends Filter
 {

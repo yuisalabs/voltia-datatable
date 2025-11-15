@@ -1,16 +1,16 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Facades;
+namespace Yuisalabs\VoltiaDatatable\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Yuisa\VoltiaDatatable\VoltiaDatatable
+ * @see \Yuisalabs\VoltiaDatatable\VoltiaDatatable
  */
 class VoltiaDatatable extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Yuisa\VoltiaDatatable\VoltiaDatatable::class;
+        return \Yuisalabs\VoltiaDatatable\VoltiaDatatable::class;
     }
 }

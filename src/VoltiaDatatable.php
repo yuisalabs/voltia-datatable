@@ -1,5 +1,5 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable;
+namespace Yuisalabs\VoltiaDatatable;
 
 class VoltiaDatatable {}

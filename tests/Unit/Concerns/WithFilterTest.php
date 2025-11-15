@@ -3,9 +3,9 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Concerns\WithFilter;
-use Yuisa\VoltiaDatatable\Filters\SelectFilter;
-use Yuisa\VoltiaDatatable\Filters\TextFilter;
+use Yuisalabs\VoltiaDatatable\Concerns\WithFilter;
+use Yuisalabs\VoltiaDatatable\Filters\SelectFilter;
+use Yuisalabs\VoltiaDatatable\Filters\TextFilter;
 
 beforeEach(function () {
     Schema::create('test_posts', function (Blueprint $table) {

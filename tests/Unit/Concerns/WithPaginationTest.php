@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Concerns\WithPagination;
+use Yuisalabs\VoltiaDatatable\Concerns\WithPagination;
 
 beforeEach(function () {
     Schema::create('test_items', function (Blueprint $table) {

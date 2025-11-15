@@ -1,6 +1,6 @@
 <?php
 
-use Yuisa\VoltiaDatatable\Column;
+use Yuisalabs\VoltiaDatatable\Column;
 
 describe('Column', function () {
     it('can create a column with make method', function () {

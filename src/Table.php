@@ -1,13 +1,13 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable;
+namespace Yuisalabs\VoltiaDatatable;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Yuisa\VoltiaDatatable\Concerns\WithFilter;
-use Yuisa\VoltiaDatatable\Concerns\WithPagination;
-use Yuisa\VoltiaDatatable\Concerns\WithSearch;
-use Yuisa\VoltiaDatatable\Concerns\WithSort;
+use Yuisalabs\VoltiaDatatable\Concerns\WithFilter;
+use Yuisalabs\VoltiaDatatable\Concerns\WithPagination;
+use Yuisalabs\VoltiaDatatable\Concerns\WithSearch;
+use Yuisalabs\VoltiaDatatable\Concerns\WithSort;
 
 abstract class Table
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable;
+namespace Yuisalabs\VoltiaDatatable;
 
 use Illuminate\Database\Eloquent\Builder;
 

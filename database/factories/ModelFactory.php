@@ -1,6 +1,6 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Database\Factories;
+namespace Yuisalabs\VoltiaDatatable\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 

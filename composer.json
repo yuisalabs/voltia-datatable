@@ -34,13 +34,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Yuisa\\VoltiaDatatable\\": "src/",
-            "Yuisa\\VoltiaDatatable\\Database\\Factories\\": "database/factories/"
+            "Yuisalabs\\VoltiaDatatable\\": "src/",
+            "Yuisalabs\\VoltiaDatatable\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yuisa\\VoltiaDatatable\\Tests\\": "tests/",
+            "Yuisalabs\\VoltiaDatatable\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -62,10 +62,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Yuisa\\VoltiaDatatable\\VoltiaDatatableServiceProvider"
+                "Yuisalabs\\VoltiaDatatable\\VoltiaDatatableServiceProvider"
             ],
             "aliases": {
-                "VoltiaDatatable": "Yuisa\\VoltiaDatatable\\Facades\\VoltiaDatatable"
+                "VoltiaDatatable": "Yuisalabs\\VoltiaDatatable\\Facades\\VoltiaDatatable"
             }
         }
     },

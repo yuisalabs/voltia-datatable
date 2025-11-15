@@ -1,6 +1,6 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable\Commands;
+namespace Yuisalabs\VoltiaDatatable\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;

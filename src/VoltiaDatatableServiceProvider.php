@@ -1,10 +1,10 @@
 <?php
 
-namespace Yuisa\VoltiaDatatable;
+namespace Yuisalabs\VoltiaDatatable;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Yuisa\VoltiaDatatable\Commands\VoltiaDatatableCommand;
+use Yuisalabs\VoltiaDatatable\Commands\VoltiaDatatableCommand;
 
 class VoltiaDatatableServiceProvider extends PackageServiceProvider
 {

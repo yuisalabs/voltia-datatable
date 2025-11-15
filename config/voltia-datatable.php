@@ -1,6 +1,6 @@
 <?php
 
-// config for Yuisa/VoltiaDatatable
+// config for Yuisalabs/VoltiaDatatable
 return [
     'default_per_page' => 15,
     'per_page_options' => [10, 15, 25, 50, 100],

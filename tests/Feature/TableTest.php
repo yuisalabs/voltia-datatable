@@ -5,10 +5,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Column;
-use Yuisa\VoltiaDatatable\Table;
-use Yuisa\VoltiaDatatable\Filters\SelectFilter;
-use Yuisa\VoltiaDatatable\Filters\TextFilter;
+use Yuisalabs\VoltiaDatatable\Column;
+use Yuisalabs\VoltiaDatatable\Table;
+use Yuisalabs\VoltiaDatatable\Filters\SelectFilter;
+use Yuisalabs\VoltiaDatatable\Filters\TextFilter;
 
 beforeEach(function () {
     Schema::create('users', function (Blueprint $table) {

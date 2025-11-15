@@ -4,8 +4,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Concerns\WithSearch;
-use Yuisa\VoltiaDatatable\Column;
+use Yuisalabs\VoltiaDatatable\Concerns\WithSearch;
+use Yuisalabs\VoltiaDatatable\Column;
 
 beforeEach(function () {
     Schema::create('test_users', function (Blueprint $table) {

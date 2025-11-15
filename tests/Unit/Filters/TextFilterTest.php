@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Yuisa\VoltiaDatatable\Filters\TextFilter;
+use Yuisalabs\VoltiaDatatable\Filters\TextFilter;
 
 beforeEach(function () {
     Schema::create('test_models', function (Blueprint $table) {
