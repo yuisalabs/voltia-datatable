@@ -4,6 +4,10 @@ namespace Yuisalabs\VoltiaDatatable;
 
 class Column
 {
+    protected string $type = 'text';
+
+    protected array $config = [];
+
     public function __construct(
         public string $key,
         public ?string $label = null,
@@ -58,9 +62,16 @@ class Column
         return $this;
     }
 
+    public function config (array $config): static
+    {
+        $this->config = array_merge($this->config, $config);
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
+            'type' => $this->type,
             'key' => $this->key,
             'label' => $this->label,
             'sortable' => $this->sortable,
@@ -69,6 +80,7 @@ class Column
             'align' => $this->align,
             'minWidth' => $this->minWidth,
             'hidden' => $this->hidden,
+            'config' => $this->config,
         ];
     }
 }
