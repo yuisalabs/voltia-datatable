@@ -68,6 +68,11 @@ class Column
         return $this;
     }
 
+    public function value(mixed $row, mixed $raw): mixed
+    {
+        return is_callable($this->format) ? ($this->format)($row, $raw) : $raw;
+    }
+
     public function toArray(): array
     {
         return [
@@ -76,7 +81,6 @@ class Column
             'label' => $this->label,
             'sortable' => $this->sortable,
             'searchable' => $this->searchable,
-            'format' => $this->format,
             'align' => $this->align,
             'minWidth' => $this->minWidth,
             'hidden' => $this->hidden,

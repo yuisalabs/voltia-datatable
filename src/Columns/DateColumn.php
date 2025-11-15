@@ -30,17 +30,21 @@ class DateColumn extends Column
         return $this;
     }
 
-    public function useDefaultFormatter(): static
+    public function value(mixed $row, mixed $raw): mixed
     {
-        $this->format(function ($row, $value) {
-            if (!$value) return $value;
+        if (is_callable($this->format)) {
+            return ($this->format)($row, $raw);
+        }
 
-            $carbon = $value instanceof CarbonInterface ? $value : Carbon::parse($value);
-            if ($this->timezone) $carbon = $carbon->setTimezone($this->timezone);
+        if ($raw === null || $raw === '') {
+            return $raw;
+        }
 
-            return $carbon->format($this->dateFormat);
-        });
+        $carbon = $raw instanceof CarbonInterface ? $raw : Carbon::parse($raw);
+        if ($this->timezone) {
+            $carbon = $carbon->setTimezone($this->timezone);
+        }
 
-        return $this;
+        return $carbon->format($this->dateFormat);
     }
 }

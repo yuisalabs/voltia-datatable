@@ -36,13 +36,24 @@ abstract class Table
         if ($name == 'make') {
             /** @var static $table */
             $table = app(static::class);
-            return $table->make();
+            return $table->build();
         }
 
         throw new BadMethodCallException(sprintf(
             'Method %s::%s does not exist.',
             static::class,
             $name
+        ));
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name === 'make') {
+            return $this->build();
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s->%s() does not exist.', static::class, $name
         ));
     }
 
@@ -65,7 +76,7 @@ abstract class Table
         $this->perPage = $this->normalizePerPage($requestedPerPage, $perPageOptions, $defaultPerPage);
     }
 
-    public function make(): array
+    public function build(): array
     {
         $this->mountFromRequest();
 
@@ -82,8 +93,9 @@ abstract class Table
 
         $rows = $paginator->getCollection()->map(function ($row) {
             return collect($this->columns)->mapWithKeys(function (Column $column) use ($row) {
-                $value = data_get($row, $column->key);
-                if ($column->format) $value = ($column->format)($row, $value);
+                $rawData = data_get($row, $column->key);
+                $value = $column->value($row, $rawData);
+
                 return [$column->key => $value];
             })->all();
         })->values();
@@ -94,6 +106,7 @@ abstract class Table
             'meta' => [
                 'page' => $paginator->currentPage(),
                 'perPage' => $paginator->perPage(),
+                'perPageOptions' => $this->resolvePerPageOptions((int) config('voltia-datatable.max_per_page', 100)),
                 'total' => $paginator->total(),
                 'from' => $paginator->firstItem(),
                 'to' => $paginator->lastItem(),
