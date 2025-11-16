@@ -10,7 +10,7 @@ class NumericColumn extends Column
 
     protected int $decimals = 0;
 
-    protected string $decimalSeparator = '.';
+    protected string $decimalsSeparator = '.';
 
     protected string $thousandsSeparator = ',';
 
@@ -33,15 +33,15 @@ class NumericColumn extends Column
         return $this;
     }
 
-    public function decimalSeparator(string $separator): static
+    public function decimalsSeparator(string $separator): static
     {
-        $this->decimalSeparator = $separator;
+        $this->decimalsSeparator = $separator;
         $this->numericConfig();
 
         return $this;
     }
 
-    public function thousandSeparator(string $separator): static
+    public function thousandsSeparator(string $separator): static
     {
         $this->thousandsSeparator = $separator;
         $this->numericConfig();
@@ -65,25 +65,37 @@ class NumericColumn extends Column
         return $this;
     }
 
-    public function useDefaultFormatter(): static
+    public function value(mixed $row, mixed $raw): mixed
     {
-        $this->format(function ($row, $value) {
-            if ($value === null || $value === '') return $value;
+        if (is_callable($this->format)) {
+            return ($this->format)($row, $raw);
+        }
 
-            $num = (float) $value;
-            $formatted = number_format($num, $this->decimalSeparator, $this->thousandsSeparator);
-            
-            return ($this->prefix . $formatted . $this->suffix);
-        });
+        if ($raw === null || $raw === '') {
+            return $raw;
+        }
 
-        return $this;
+        if (!is_numeric($raw)) {
+            return $raw;
+        }
+
+        $num = (float) $raw;
+
+        $formatted = number_format(
+            $num,
+            $this->decimals,
+            $this->decimalsSeparator,
+            $this->thousandsSeparator
+        );
+
+        return $this->prefix . $formatted . $this->suffix;
     }
 
     protected function numericConfig(): void
     {
         $this->config([
             'decimals' => $this->decimals,
-            'decimalSeparator' => $this->decimalSeparator,
+            'decimalsSeparator' => $this->decimalsSeparator,
             'thousandsSeparator' => $this->thousandsSeparator,
             'prefix' => $this->prefix,
             'suffix' => $this->suffix,
