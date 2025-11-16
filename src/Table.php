@@ -110,6 +110,9 @@ abstract class Table
                 'total' => $paginator->total(),
                 'from' => $paginator->firstItem(),
                 'to' => $paginator->lastItem(),
+                'currentPage' => $paginator->currentPage(),
+                'firstPage' => 1,
+                'lastPage' => $paginator->lastPage()
             ],
             'sort' => [
                 'sortBy' => $this->sortKey,
