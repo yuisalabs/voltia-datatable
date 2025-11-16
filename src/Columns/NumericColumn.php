@@ -81,14 +81,7 @@ class NumericColumn extends Column
 
         $num = (float) $raw;
 
-        $formatted = number_format(
-            $num,
-            $this->decimals,
-            $this->decimalsSeparator,
-            $this->thousandsSeparator
-        );
-
-        return $this->prefix . $formatted . $this->suffix;
+        return $num;
     }
 
     protected function numericConfig(): void
