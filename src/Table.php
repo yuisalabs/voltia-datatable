@@ -12,13 +12,28 @@ use Yuisalabs\VoltiaDatatable\Concerns\WithSort;
 
 abstract class Table
 {
-    use WithSort,WithFilter, WithSearch, WithPagination;
+    use WithSort, WithFilter, WithSearch, WithPagination;
 
     /** @var Column[] */
     protected array $columns = [];
 
     /** @var array<int> */
     protected array $perPageOptions = [];
+
+    /** @var int|null */
+    protected ?int $defaultPerPage = null;
+
+    /** @var array<string> */
+    protected array $sortable = [];
+
+    /** @var array<string> */
+    protected array $searchable = [];
+
+    /** @var string|null */
+    protected ?string $defaultSortColumn = null;
+
+    /** @var string */
+    protected string $defaultSortDirection = 'asc';    
 
     /** @return Builder */
     abstract public function query(): Builder;
@@ -62,15 +77,17 @@ abstract class Table
         $request = request();
 
         $this->columns = $this->columns();
+        $this->applySortable();
+        $this->applySearchable();
         $this->filters = $this->filters();
 
         $this->search = $request->input('search', $this->search) ?: null;
-        $this->sortKey = $request->input('sortBy', $this->sortKey) ?: null;
-        $this->sortDirection = $request->input('sortDirection', $this->sortDirection) === 'desc' ? 'desc' : 'asc';
+        $this->sortKey = $request->input('sortBy', $this->defaultSortColumn) ?: null;
+        $this->sortDirection = $request->input('sortDirection', $this->defaultSortDirection) === 'desc' ? 'desc' : 'asc';
         
         $maxPerPage = config('voltia-datatable.max_per_page', 100);
         $perPageOptions = $this->resolvePerPageOptions($maxPerPage);
-        $defaultPerPage = config('voltia-datatable.default_per_page', 15);
+        $defaultPerPage = $this->defaultPerPage ?? config('voltia-datatable.default_per_page', 15);
 
         $requestedPerPage = (int) $request->integer('perPage', $defaultPerPage);
         $this->perPage = $this->normalizePerPage($requestedPerPage, $perPageOptions, $defaultPerPage);
@@ -91,7 +108,8 @@ abstract class Table
         /** @var LengthAwarePaginator $paginator */
         $paginator = $this->paginate($query);
 
-        $rows = $paginator->getCollection()->map(function ($row) {
+        /** @var \Illuminate\Support\Collection $rows */
+        $rows = collect($paginator->items())->map(function ($row) {
             return collect($this->columns)->mapWithKeys(function (Column $column) use ($row) {
                 $rawData = data_get($row, $column->key);
                 $value = $column->value($row, $rawData);
@@ -171,5 +189,23 @@ abstract class Table
         return in_array($requested, $options, true)
             ? $requested
             : (in_array($default, $options, true) ? $default : $options[0]);
+    }
+
+    protected function applySortable()
+    {
+        foreach ($this->columns as $column) {
+            if (in_array($column->key, $this->sortable, true)) {
+                $column->sortable();
+            }
+        }
+    }
+
+    protected function applySearchable()
+    {
+        foreach ($this->columns as $column) {
+            if (in_array($column->key, $this->searchable, true)) {
+                $column->searchable();
+            }
+        }
     }
 }
