@@ -137,17 +137,39 @@ abstract class Table
                 'sortDirection' => $this->sortDirection,
             ],
             'search' => $this->search,
-            'filters' => $this->filtersMeta(),
+            'filters' => $this->getActiveFilters(),
+            'filtersMeta' => $this->filtersMeta(),
         ];
+    }
+
+    protected function getActiveFilters(): array
+    {
+        $activeFilters = [];
+        foreach ($this->filters as $filter) {
+            $value = request("filters.{$filter->column}");
+            if ($value !== null) {
+                $activeFilters[$filter->column] = $value;
+
+                $operator = request("filters.{$filter->column}_operator");
+                if ($operator !== null && $operator !== '') {
+                    $activeFilters["{$filter->column}_operator"] = $operator;
+                }
+            }
+        }
+        return $activeFilters;
     }
 
     protected function filtersMeta(): array
     {
         $out = [];
-        foreach ($this->filters  as $key => $filter) {
+        foreach ($this->filters as $key => $filter) {
+            $meta = $filter->meta();
             $out[$key] = array_merge(
-                ['value' => request("filters.$key")],
-                $filter->meta()
+                [
+                    'key' => $meta['column'] ?? $key,
+                    'label' => $meta['label'] ?? ucfirst(str_replace('_', ' ', $key)),
+                ],
+                $meta
             );
         }
         return $out;

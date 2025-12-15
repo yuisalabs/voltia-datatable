@@ -17,9 +17,43 @@ trait WithSort
         $columns = collect($this->columns)->filter->sortable->pluck('key')->all();
         if (!in_array($this->sortKey, $columns, true)) return;
         
+        $model = $query->getModel();
+        $tableName = $model->getTable();
+        
+        if (str_contains($this->sortKey, '.')) {
+            $this->applySortWithRelation($query, $this->sortKey);
+        } else {
+            $query->orderBy(
+                $tableName . '.' . $this->sortKey,
+                $this->sortDirection === 'desc' ? 'desc' : 'asc'
+            );
+        }
+    }
+
+    protected function applySortWithRelation(Builder $query, string $sortKey): void
+    {
+        [$relation, $column] = explode('.', $sortKey, 2);
+        
+        $model = $query->getModel();
+        $relationInstance = $model->{$relation}();
+        $relatedModel = $relationInstance->getRelated();
+        $relationTable = $relatedModel->getTable();
+
+        if (method_exists($relationInstance, 'getForeignKeyName')) {
+            $foreignKey = $relationInstance->getForeignKeyName();
+            $ownerKey = $relationInstance->getOwnerKeyName();
+            
+            $query->leftJoin(
+                $relationTable,
+                $model->getTable() . '.' . $foreignKey,
+                '=',
+                $relationTable . '.' . $ownerKey
+            );
+        }
+
         $query->orderBy(
-            $this->sortKey,
+            $relationTable . '.' . $column,
             $this->sortDirection === 'desc' ? 'desc' : 'asc'
-        );
+        )->select($model->getTable() . '.*');
     }
 }

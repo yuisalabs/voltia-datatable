@@ -11,8 +11,8 @@ trait WithFilter
 
     protected function applyFilters(Builder $query): void
     {
-        foreach ($this->filters as $key => $filter) {
-            $value = request("filters.$key");
+        foreach ($this->filters as $filter) {
+            $value = request("filters.{$filter->column}");
             $filter->apply($query, $value);
         }
     }
@@ -20,9 +20,9 @@ trait WithFilter
     protected function filtersMeta(): array
     {
         $meta = [];
-        foreach ($this->filters as $key => $filter) {
-            $meta[$key] = array_merge(
-                ['value' => request("filters.$key")],
+        foreach ($this->filters as $filter) {
+            $meta[$filter->column] = array_merge(
+                ['value' => request("filters.{$filter->column}")],
                 $filter->meta()
             );
         }

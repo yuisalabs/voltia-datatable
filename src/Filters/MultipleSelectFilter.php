@@ -5,7 +5,7 @@ namespace Yuisalabs\VoltiaDatatable\Filters;
 use Illuminate\Database\Eloquent\Builder;
 use Yuisalabs\VoltiaDatatable\Filter;
 
-class SelectFilter extends Filter
+class MultipleSelectFilter extends Filter
 {
     /**
      * @param array<string, string> $options
@@ -27,15 +27,21 @@ class SelectFilter extends Filter
     {
         if ($value === null || $value === '') return;
 
-        $operator = request("filters.{$this->column}_operator", 'equals');
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        if (empty($value)) return;
+
+        $operator = request("filters.{$this->column}_operator", 'is_in');
 
         switch ($operator) {
-            case 'does_not_equal':
-                $query->where($this->column, '!=', $value);
+            case 'is_not_in':
+                $query->whereNotIn($this->column, $value);
                 break;
-            case 'equals':
+            case 'is_in':
             default:
-                $query->where($this->column, '=', $value);
+                $query->whereIn($this->column, $value);
                 break;
         }
     }
@@ -43,16 +49,16 @@ class SelectFilter extends Filter
     public function meta(): array
     {
         return [
-            'type' => 'select',
+            'type' => 'multiple-select',
             'column' => $this->column,
             'label' => $this->label ?? ucfirst(str_replace('_', ' ', $this->column)),
             'options' => $this->options,
-            'placeholder' => 'Select an option...',
+            'placeholder' => 'Select options...',
             'operators' => [
-                ['value' => 'equals', 'label' => 'Equals'],
-                ['value' => 'does_not_equal', 'label' => 'Does Not Equal'],
+                ['value' => 'is_in', 'label' => 'Is In'],
+                ['value' => 'is_not_in', 'label' => 'Is Not In'],
             ],
-            'defaultOperator' => 'equals',
+            'defaultOperator' => 'is_in',
         ];
     }
 }
