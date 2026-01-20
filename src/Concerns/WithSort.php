@@ -54,6 +54,11 @@ trait WithSort
         $query->orderBy(
             $relationTable . '.' . $column,
             $this->sortDirection === 'desc' ? 'desc' : 'asc'
-        )->select($model->getTable() . '.*');
+        );
+
+        $existingSelects = $query->getQuery()->columns;
+        if (empty($existingSelects)) {
+            $query->select($model->getTable() . '.*');
+        }
     }
 }
