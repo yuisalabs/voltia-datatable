@@ -12,4 +12,16 @@ abstract class Filter
      * Metadata about the filter for frontend use
      */
     abstract public function meta(): array;
+
+    /**
+     * Qualify column name with table name to avoid ambiguity when joins are present
+     */
+    protected function qualifyColumn(Builder $query, string $column): string
+    {
+        if (str_contains($column, '.')) {
+            return $column;
+        }
+
+        return $query->getModel()->getTable() . '.' . $column;
+    }
 }

@@ -20,31 +20,33 @@ class TextFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", 'contains');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         switch ($operator) {
             case 'does_not_contain':
-                $query->where($this->column, 'not like', "%$value%");
+                $query->where($column, 'not like', "%$value%");
                 break;
             case 'equals':
-                $query->where($this->column, '=', $value);
+                $query->where($column, '=', $value);
                 break;
             case 'does_not_equal':
-                $query->where($this->column, '!=', $value);
+                $query->where($column, '!=', $value);
                 break;
             case 'starts_with':
-                $query->where($this->column, 'like', "$value%");
+                $query->where($column, 'like', "$value%");
                 break;
             case 'does_not_start_with':
-                $query->where($this->column, 'not like', "$value%");
+                $query->where($column, 'not like', "$value%");
                 break;
             case 'ends_with':
-                $query->where($this->column, 'like', "%$value");
+                $query->where($column, 'like', "%$value");
                 break;
             case 'does_not_end_with':
-                $query->where($this->column, 'not like', "%$value");
+                $query->where($column, 'not like', "%$value");
                 break;
             case 'contains':
             default:
-                $query->where($this->column, 'like', "%$value%");
+                $query->where($column, 'like', "%$value%");
                 break;
         }
     }

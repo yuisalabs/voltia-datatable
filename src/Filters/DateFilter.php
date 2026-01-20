@@ -31,16 +31,18 @@ class DateFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", '=');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         match ($operator) {
-            'does_not_equal' => $query->whereDate($this->column, '!=', $date->format('Y-m-d')),
-            'is_after' => $query->whereDate($this->column, '>', $date->format('Y-m-d')),
-            'is_before' => $query->whereDate($this->column, '<', $date->format('Y-m-d')),
-            'is_after_or_equal' => $query->whereDate($this->column, '>=', $date->format('Y-m-d')),
-            'is_before_or_equal' => $query->whereDate($this->column, '<=', $date->format('Y-m-d')),
-            'equals' => $query->whereDate($this->column, '=', $date->format('Y-m-d')),
-            'is_set' => $query->whereNotNull($this->column),
-            'is_not_set' => $query->whereNull($this->column),
-            default => $query->whereDate($this->column, '=', $date->format('Y-m-d')),
+            'does_not_equal' => $query->whereDate($column, '!=', $date->format('Y-m-d')),
+            'is_after' => $query->whereDate($column, '>', $date->format('Y-m-d')),
+            'is_before' => $query->whereDate($column, '<', $date->format('Y-m-d')),
+            'is_after_or_equal' => $query->whereDate($column, '>=', $date->format('Y-m-d')),
+            'is_before_or_equal' => $query->whereDate($column, '<=', $date->format('Y-m-d')),
+            'equals' => $query->whereDate($column, '=', $date->format('Y-m-d')),
+            'is_set' => $query->whereNotNull($column),
+            'is_not_set' => $query->whereNull($column),
+            default => $query->whereDate($column, '=', $date->format('Y-m-d')),
         };
     }
 

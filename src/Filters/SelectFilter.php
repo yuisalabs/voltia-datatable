@@ -29,13 +29,15 @@ class SelectFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", 'equals');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         switch ($operator) {
             case 'does_not_equal':
-                $query->where($this->column, '!=', $value);
+                $query->where($column, '!=', $value);
                 break;
             case 'equals':
             default:
-                $query->where($this->column, '=', $value);
+                $query->where($column, '=', $value);
                 break;
         }
     }

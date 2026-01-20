@@ -35,13 +35,15 @@ class MultipleSelectFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", 'is_in');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         switch ($operator) {
             case 'is_not_in':
-                $query->whereNotIn($this->column, $value);
+                $query->whereNotIn($column, $value);
                 break;
             case 'is_in':
             default:
-                $query->whereIn($this->column, $value);
+                $query->whereIn($column, $value);
                 break;
         }
     }

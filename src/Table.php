@@ -33,7 +33,10 @@ abstract class Table
     protected ?string $defaultSortColumn = null;
 
     /** @var string */
-    protected string $defaultSortDirection = 'asc';    
+    protected string $defaultSortDirection = 'asc';
+
+    /** @var Action[] */
+    protected array $tableActions = [];
 
     /** @return Builder */
     abstract public function query(): Builder;
@@ -42,6 +45,11 @@ abstract class Table
     abstract public function columns(): array;
 
     protected function filters(): array
+    {
+        return [];
+    }
+
+    protected function actions(): array
     {
         return [];
     }
@@ -80,6 +88,7 @@ abstract class Table
         $this->applySortable();
         $this->applySearchable();
         $this->filters = $this->filters();
+        $this->tableActions = $this->actions();
 
         $this->search = $request->input('search', $this->search) ?: null;
         $this->sortKey = $request->input('sortBy', $this->defaultSortColumn) ?: null;
@@ -109,10 +118,17 @@ abstract class Table
         $paginator = $this->paginate($query);
 
         /** @var \Illuminate\Support\Collection $rows */
-        $rows = collect($paginator->items())->map(function ($row) {
-            return collect($this->columns)->mapWithKeys(function (Column $column) use ($row) {
-                $rawData = data_get($row, $column->key);
-                $value = $column->value($row, $rawData);
+        $rows = collect($paginator->items())->map(function ($row, $index) use ($paginator) {
+            return collect($this->columns)->mapWithKeys(function (Column $column) use ($row, $index, $paginator) {
+                if ($column instanceof \Yuisalabs\VoltiaDatatable\Columns\RowNumberColumn) {
+                    $startFrom = $column->getStartFrom();
+                    $offset = ($paginator->currentPage() - 1) * $paginator->perPage();
+                    $rowNumber = $offset + $index + $startFrom;
+                    $value = $column->value($row, $rowNumber);
+                } else {
+                    $rawData = data_get($row, $column->key);
+                    $value = $column->value($row, $rawData);
+                }
 
                 return [$column->key => $value];
             })->all();
@@ -139,6 +155,7 @@ abstract class Table
             'search' => $this->search,
             'filters' => $this->getActiveFilters(),
             'filtersMeta' => $this->filtersMeta(),
+            'actions' => $this->getVisibleActions(),
         ];
     }
 
@@ -229,5 +246,14 @@ abstract class Table
                 $column->searchable();
             }
         }
+    }
+
+    protected function getVisibleActions(): array
+    {
+        return collect($this->tableActions)
+            ->filter(fn (Action $action) => $action->isVisible())
+            ->map(fn (Action $action) => $action->toArray())
+            ->values()
+            ->all();
     }
 }

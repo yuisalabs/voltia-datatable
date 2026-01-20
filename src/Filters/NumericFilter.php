@@ -24,35 +24,37 @@ class NumericFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", 'equals');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         switch ($operator) {
             case 'does_not_equal':
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '!=', $numericValue);
+                    $query->where($column, '!=', $numericValue);
                 }
                 break;
             case 'is_greater_than':
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '>', $numericValue);
+                    $query->where($column, '>', $numericValue);
                 }
                 break;
             case 'is_greater_than_or_equal_to':
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '>=', $numericValue);
+                    $query->where($column, '>=', $numericValue);
                 }
                 break;
             case 'is_less_than':
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '<', $numericValue);
+                    $query->where($column, '<', $numericValue);
                 }
                 break;
             case 'is_less_than_or_equal_to':
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '<=', $numericValue);
+                    $query->where($column, '<=', $numericValue);
                 }
                 break;
             case 'is_between':
@@ -60,7 +62,7 @@ class NumericFilter extends Filter
                     $min = is_numeric($value[0]) ? $value[0] : null;
                     $max = is_numeric($value[1]) ? $value[1] : null;
                     if ($min !== null && $max !== null) {
-                        $query->whereBetween($this->column, [$min, $max]);
+                        $query->whereBetween($column, [$min, $max]);
                     }
                 }
                 break;
@@ -69,7 +71,7 @@ class NumericFilter extends Filter
                     $min = is_numeric($value[0]) ? $value[0] : null;
                     $max = is_numeric($value[1]) ? $value[1] : null;
                     if ($min !== null && $max !== null) {
-                        $query->whereNotBetween($this->column, [$min, $max]);
+                        $query->whereNotBetween($column, [$min, $max]);
                     }
                 }
                 break;
@@ -77,7 +79,7 @@ class NumericFilter extends Filter
             default:
                 $numericValue = is_numeric($value) ? $value : null;
                 if ($numericValue !== null) {
-                    $query->where($this->column, '=', $numericValue);
+                    $query->where($column, '=', $numericValue);
                 }
                 break;
         }

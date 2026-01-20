@@ -17,7 +17,9 @@ class BooleanFilter extends Filter
     public function apply(Builder $query, mixed $value): void
     {
         if ($value === null || $value === '') return;
-        $query->where($this->column, (bool) $value);
+
+        $column = $this->qualifyColumn($query, $this->column);
+        $query->where($column, (bool) $value);
     }
 
     public function meta(): array

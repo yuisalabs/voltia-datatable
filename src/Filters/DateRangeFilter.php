@@ -24,10 +24,12 @@ class DateRangeFilter extends Filter
 
         $operator = request("filters.{$this->column}_operator", 'is_between');
 
+        $column = $this->qualifyColumn($query, $this->column);
+
         match ($operator) {
-            'is_not_between' => $query->whereDateBetween($this->column, [$start, $end], true),
-            'is_between' => $query->whereDateBetween($this->column, [$start, $end], false),
-            default => $query->whereDateBetween($this->column, [$start, $end], false),
+            'is_not_between' => $query->whereDateBetween($column, [$start, $end], true),
+            'is_between' => $query->whereDateBetween($column, [$start, $end], false),
+            default => $query->whereDateBetween($column, [$start, $end], false),
         };
     }
 
