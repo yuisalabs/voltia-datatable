@@ -7,12 +7,19 @@ use Yuisalabs\VoltiaDatatable\Filter;
 
 class BooleanFilter extends Filter
 {
-    public function __construct(public string $column) {}
+    public function __construct(public string $column, public ?string $label = null) {}
+
+    public static function make(string $column, ?string $label = null): static
+    {
+        return new static($column, $label);
+    }
     
     public function apply(Builder $query, mixed $value): void
     {
         if ($value === null || $value === '') return;
-        $query->where($this->column, (bool) $value);
+
+        $column = $this->qualifyColumn($query, $this->column);
+        $query->where($column, (bool) $value);
     }
 
     public function meta(): array
@@ -20,6 +27,7 @@ class BooleanFilter extends Filter
         return [
             'type' => 'boolean',
             'column' => $this->column,
+            'label' => $this->label ?? ucfirst(str_replace('_', ' ', $this->column)),
         ];
     }
 }

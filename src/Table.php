@@ -12,13 +12,31 @@ use Yuisalabs\VoltiaDatatable\Concerns\WithSort;
 
 abstract class Table
 {
-    use WithSort,WithFilter, WithSearch, WithPagination;
+    use WithSort, WithFilter, WithSearch, WithPagination;
 
     /** @var Column[] */
     protected array $columns = [];
 
     /** @var array<int> */
     protected array $perPageOptions = [];
+
+    /** @var int|null */
+    protected ?int $defaultPerPage = null;
+
+    /** @var array<string> */
+    protected array $sortable = [];
+
+    /** @var array<string> */
+    protected array $searchable = [];
+
+    /** @var string|null */
+    protected ?string $defaultSortColumn = null;
+
+    /** @var string */
+    protected string $defaultSortDirection = 'asc';
+
+    /** @var Action[] */
+    protected array $tableActions = [];
 
     /** @return Builder */
     abstract public function query(): Builder;
@@ -31,12 +49,17 @@ abstract class Table
         return [];
     }
 
+    protected function actions(): array
+    {
+        return [];
+    }
+
     public static function __callStatic($name, $arguments)
     {
         if ($name == 'make') {
             /** @var static $table */
             $table = app(static::class);
-            return $table->make();
+            return $table->build();
         }
 
         throw new BadMethodCallException(sprintf(
@@ -46,26 +69,40 @@ abstract class Table
         ));
     }
 
+    public function __call($name, $arguments)
+    {
+        if ($name === 'make') {
+            return $this->build();
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s->%s() does not exist.', static::class, $name
+        ));
+    }
+
     public function mountFromRequest(): void
     {
         $request = request();
 
         $this->columns = $this->columns();
+        $this->applySortable();
+        $this->applySearchable();
         $this->filters = $this->filters();
+        $this->tableActions = $this->actions();
 
         $this->search = $request->input('search', $this->search) ?: null;
-        $this->sortKey = $request->input('sortBy', $this->sortKey) ?: null;
-        $this->sortDirection = $request->input('sortDirection', $this->sortDirection) === 'desc' ? 'desc' : 'asc';
+        $this->sortKey = $request->input('sortBy', $this->defaultSortColumn) ?: null;
+        $this->sortDirection = $request->input('sortDirection', $this->defaultSortDirection) === 'desc' ? 'desc' : 'asc';
         
         $maxPerPage = config('voltia-datatable.max_per_page', 100);
         $perPageOptions = $this->resolvePerPageOptions($maxPerPage);
-        $defaultPerPage = config('voltia-datatable.default_per_page', 15);
+        $defaultPerPage = $this->defaultPerPage ?? config('voltia-datatable.default_per_page', 15);
 
         $requestedPerPage = (int) $request->integer('perPage', $defaultPerPage);
         $this->perPage = $this->normalizePerPage($requestedPerPage, $perPageOptions, $defaultPerPage);
     }
 
-    public function make(): array
+    public function build(): array
     {
         $this->mountFromRequest();
 
@@ -80,10 +117,19 @@ abstract class Table
         /** @var LengthAwarePaginator $paginator */
         $paginator = $this->paginate($query);
 
-        $rows = $paginator->getCollection()->map(function ($row) {
-            return collect($this->columns)->mapWithKeys(function (Column $column) use ($row) {
-                $value = data_get($row, $column->key);
-                if ($column->format) $value = ($column->format)($row, $value);
+        /** @var \Illuminate\Support\Collection $rows */
+        $rows = collect($paginator->items())->map(function ($row, $index) use ($paginator) {
+            return collect($this->columns)->mapWithKeys(function (Column $column) use ($row, $index, $paginator) {
+                if ($column instanceof \Yuisalabs\VoltiaDatatable\Columns\RowNumberColumn) {
+                    $startFrom = $column->getStartFrom();
+                    $offset = ($paginator->currentPage() - 1) * $paginator->perPage();
+                    $rowNumber = $offset + $index + $startFrom;
+                    $value = $column->value($row, $rowNumber);
+                } else {
+                    $rawData = data_get($row, $column->key);
+                    $value = $column->value($row, $rawData);
+                }
+
                 return [$column->key => $value];
             })->all();
         })->values();
@@ -94,26 +140,53 @@ abstract class Table
             'meta' => [
                 'page' => $paginator->currentPage(),
                 'perPage' => $paginator->perPage(),
+                'perPageOptions' => $this->resolvePerPageOptions((int) config('voltia-datatable.max_per_page', 100)),
                 'total' => $paginator->total(),
                 'from' => $paginator->firstItem(),
                 'to' => $paginator->lastItem(),
+                'currentPage' => $paginator->currentPage(),
+                'firstPage' => 1,
+                'lastPage' => $paginator->lastPage()
             ],
             'sort' => [
                 'sortBy' => $this->sortKey,
                 'sortDirection' => $this->sortDirection,
             ],
             'search' => $this->search,
-            'filters' => $this->filtersMeta(),
+            'filters' => $this->getActiveFilters(),
+            'filtersMeta' => $this->filtersMeta(),
+            'actions' => $this->getVisibleActions(),
         ];
+    }
+
+    protected function getActiveFilters(): array
+    {
+        $activeFilters = [];
+        foreach ($this->filters as $filter) {
+            $value = request("filters.{$filter->column}");
+            if ($value !== null) {
+                $activeFilters[$filter->column] = $value;
+
+                $operator = request("filters.{$filter->column}_operator");
+                if ($operator !== null && $operator !== '') {
+                    $activeFilters["{$filter->column}_operator"] = $operator;
+                }
+            }
+        }
+        return $activeFilters;
     }
 
     protected function filtersMeta(): array
     {
         $out = [];
-        foreach ($this->filters  as $key => $filter) {
+        foreach ($this->filters as $key => $filter) {
+            $meta = $filter->meta();
             $out[$key] = array_merge(
-                ['value' => request("filters.$key")],
-                $filter->meta()
+                [
+                    'key' => $meta['column'] ?? $key,
+                    'label' => $meta['label'] ?? ucfirst(str_replace('_', ' ', $key)),
+                ],
+                $meta
             );
         }
         return $out;
@@ -155,5 +228,32 @@ abstract class Table
         return in_array($requested, $options, true)
             ? $requested
             : (in_array($default, $options, true) ? $default : $options[0]);
+    }
+
+    protected function applySortable()
+    {
+        foreach ($this->columns as $column) {
+            if (in_array($column->key, $this->sortable, true)) {
+                $column->sortable();
+            }
+        }
+    }
+
+    protected function applySearchable()
+    {
+        foreach ($this->columns as $column) {
+            if (in_array($column->key, $this->searchable, true)) {
+                $column->searchable();
+            }
+        }
+    }
+
+    protected function getVisibleActions(): array
+    {
+        return collect($this->tableActions)
+            ->filter(fn (Action $action) => $action->isVisible())
+            ->map(fn (Action $action) => $action->toArray())
+            ->values()
+            ->all();
     }
 }

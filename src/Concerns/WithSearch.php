@@ -15,9 +15,19 @@ trait WithSearch
         $columns = collect($this->columns)->filter->searchable->pluck('key');
         if ($columns->isEmpty()) return;
 
-        $query->where(function (Builder $q) use ($columns) {
+        $model = $query->getModel();
+        $tableName = $model->getTable();
+
+        $query->where(function (Builder $q) use ($columns, $tableName) {
             foreach ($columns as $column) {
-                $q->orWhere($column, 'like', '%' . $this->search . '%');
+                if (str_contains($column, '.')) {
+                    [$relation, $relationColumn] = explode('.', $column, 2);
+                    $q->orWhereHas($relation, function (Builder $subQuery) use ($relationColumn) {
+                        $subQuery->where($relationColumn, 'like', '%' . $this->search . '%');
+                    });
+                } else {
+                    $q->orWhere($tableName . '.' . $column, 'like', '%' . $this->search . '%');
+                }
             }
         });
     }

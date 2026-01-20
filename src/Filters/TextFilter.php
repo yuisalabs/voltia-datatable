@@ -7,12 +7,47 @@ use Yuisalabs\VoltiaDatatable\Filter;
 
 class TextFilter extends Filter
 {
-    public function __construct(public string $column) {}
+    public function __construct(public string $column, public ?string $label = null) {}
+
+    public static function make(string $column, ?string $label = null): static
+    {
+        return new static($column, $label);
+    }
     
     public function apply(Builder $query, mixed $value): void
     {
-        if ($value != null && $value !== '') {
-            $query->where($this->column, 'like', "%$value%");
+        if ($value === null || $value === '') return;
+
+        $operator = request("filters.{$this->column}_operator", 'contains');
+
+        $column = $this->qualifyColumn($query, $this->column);
+
+        switch ($operator) {
+            case 'does_not_contain':
+                $query->where($column, 'not like', "%$value%");
+                break;
+            case 'equals':
+                $query->where($column, '=', $value);
+                break;
+            case 'does_not_equal':
+                $query->where($column, '!=', $value);
+                break;
+            case 'starts_with':
+                $query->where($column, 'like', "$value%");
+                break;
+            case 'does_not_start_with':
+                $query->where($column, 'not like', "$value%");
+                break;
+            case 'ends_with':
+                $query->where($column, 'like', "%$value");
+                break;
+            case 'does_not_end_with':
+                $query->where($column, 'not like', "%$value");
+                break;
+            case 'contains':
+            default:
+                $query->where($column, 'like', "%$value%");
+                break;
         }
     }
 
@@ -21,7 +56,19 @@ class TextFilter extends Filter
         return [
             'type' => 'text',
             'column' => $this->column,
+            'label' => $this->label ?? ucfirst(str_replace('_', ' ', $this->column)),
             'placeholder' => 'Enter text...',
+            'operators' => [
+                ['value' => 'contains', 'label' => 'Contains'],
+                ['value' => 'does_not_contain', 'label' => 'Does Not Contain'],
+                ['value' => 'starts_with', 'label' => 'Starts With'],
+                ['value' => 'ends_with', 'label' => 'Ends With'],
+                ['value' => 'does_not_start_with', 'label' => 'Does Not Start With'],
+                ['value' => 'does_not_end_with', 'label' => 'Does Not End With'],
+                ['value' => 'equals', 'label' => 'Equals'],
+                ['value' => 'does_not_equal', 'label' => 'Does Not Equal'],
+            ],
+            'defaultOperator' => 'contains',
         ];
     }
 }
